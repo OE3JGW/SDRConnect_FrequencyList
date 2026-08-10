@@ -1,0 +1,164 @@
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.settings-body {
+  height: calc(100% - 32px);
+  overflow: auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-content: start;
+  background: var(--bg-app);
+}
+
+.card {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px 16px;
+}
+
+.card.wide {
+  grid-column: 1 / -1;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: calc(var(--ui-font-size) - 0px);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.inline-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(var(--ui-font-size) - 2px);
+  color: var(--text-dim);
+}
+
+.inline-field select {
+  width: auto;
+  min-width: 180px;
+}
+
+.hint {
+  margin: 0 0 8px;
+  color: var(--text-faint);
+  font-size: calc(var(--ui-font-size) - 3px);
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.list-registry,
+.column-list,
+.download-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.column-list {
+  max-height: 340px;
+  overflow: auto;
+}
+
+.list-registry li,
+.column-list li,
+.download-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: calc(var(--ui-font-size) - 2px);
+}
+
+.list-registry li.active {
+  border-color: var(--accent);
+}
+
+.list-registry .meta {
+  color: var(--text-faint);
+  font-size: calc(var(--ui-font-size) - 4px);
+  word-break: break-all;
+}
+
+.column-list li {
+  cursor: default;
+}
+
+.column-list li.dragging {
+  opacity: 0.45;
+}
+
+.column-list li.drop-target {
+  border-top: 2px solid var(--accent);
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--text-faint);
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex: 0 0 auto;
+  line-height: 1;
+  user-select: none;
+}
+
+.column-list label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(var(--ui-font-size) - 2px);
+}
+
+.download-row {
+  justify-content: space-between;
+}
+
+.download-row .name {
+  flex: 1;
+  min-width: 0;
+}

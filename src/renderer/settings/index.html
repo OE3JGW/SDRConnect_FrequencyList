@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:;"
+    />
+    <title>FrequencyList Settings</title>
+    <link rel="stylesheet" href="../shared/theme.css" />
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <header class="titlebar">
+      <span class="title">Settings</span>
+      <span class="spacer"></span>
+      <button type="button" class="close" id="btnClose" title="Close">✕</button>
+    </header>
+
+    <main class="settings-body">
+      <section class="card">
+        <div class="card-head"><h2>Lists</h2></div>
+        <div class="row-actions">
+          <button type="button" class="btn" id="btnAddList">Add file…</button>
+          <button type="button" class="btn" id="btnReplaceList">Replace active…</button>
+          <button type="button" class="btn" id="btnRemoveList">Remove active</button>
+          <button type="button" class="btn" id="btnReloadList">Reload</button>
+        </div>
+        <ul class="list-registry" id="listRegistry"></ul>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Download</h2></div>
+        <div class="download-list" id="downloadList"></div>
+      </section>
+
+      <section class="card wide">
+        <div class="card-head">
+          <h2>Columns</h2>
+          <label class="inline-field">
+            <span>Source</span>
+            <select id="columnSourceSelect"></select>
+          </label>
+        </div>
+        <p class="hint">Drag the handle to reorder. Checkboxes toggle visibility for the selected source.</p>
+        <ul class="column-list" id="columnList"></ul>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Layout</h2></div>
+        <label class="field">
+          <span>Sidebar</span>
+          <select id="sidebarSide">
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="alwaysOnTop" />
+          <span>Always on top</span>
+        </label>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>SDRconnect</h2></div>
+        <label class="field">
+          <span>Host</span>
+          <input type="text" id="connHost" />
+        </label>
+        <label class="field">
+          <span>Port</span>
+          <input type="number" id="connPort" min="1" max="65535" />
+        </label>
+        <label class="field">
+          <span>Device</span>
+          <select id="connDevice">
+            <option value="primary">Primary</option>
+            <option value="secondary">Secondary</option>
+          </select>
+        </label>
+        <p class="hint" id="configPathHint"></p>
+      </section>
+    </main>
+
+    <script src="settings.js"></script>
+  </body>
+</html>

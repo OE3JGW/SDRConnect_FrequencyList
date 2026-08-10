@@ -1,0 +1,50 @@
+{
+  "name": "sdrconnect-frequencylist",
+  "productName": "SDRconnect FrequencyList",
+  "version": "1.2.4",
+  "description": "Horizontal frequency list panel for SDRconnect with multi-format list support",
+  "author": "SDRconnect FrequencyList",
+  "main": "src/main/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable && node scripts/postbuild-copy-dbf.js",
+    "sync:github": "node scripts/sync-github.js"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.sdrconnect.frequencylist",
+    "productName": "SDRconnect FrequencyList",
+    "directories": {
+      "output": "release/${version}",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "ILGADATA.DBF",
+        "to": "ILGADATA.DBF"
+      }
+    ],
+    "extraFiles": [
+      {
+        "from": "ILGADATA.DBF",
+        "to": "ILGADATA.DBF"
+      }
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "SDRconnect-FrequencyList-${version}.exe"
+    }
+  }
+}

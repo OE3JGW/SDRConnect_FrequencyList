@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src ws://127.0.0.1:* ws://localhost:* ws://*:*; img-src 'self' data:;"
+    />
+    <title>SDRconnect FrequencyList</title>
+    <link rel="stylesheet" href="../shared/theme.css" />
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header class="titlebar">
+      <span class="status-dot" id="statusDot" data-status="disconnected" title="SDRconnect"></span>
+      <span class="title">FrequencyList</span>
+      <span class="spacer"></span>
+    </header>
+
+    <div class="shell" id="shell" data-sidebar="left">
+      <main class="table-pane">
+        <div class="table-scroll" id="tableScroll">
+          <div class="table-header" id="tableHeader"></div>
+          <div class="table-body" id="tableBody">
+            <div class="table-spacer" id="tableSpacer"></div>
+            <div class="table-rows" id="tableRows"></div>
+          </div>
+        </div>
+        <div class="table-error hidden" id="tableError"></div>
+      </main>
+
+      <aside class="sidebar" id="sidebar">
+        <div class="utc-clock" id="utcClock" title="UTC" aria-label="UTC time">
+          <span class="utc-label">UTC</span>
+          <div class="seven-seg" id="utcDigits">00:00:00</div>
+        </div>
+
+        <select id="listSelect" title="Active frequency list"></select>
+
+        <button type="button" class="btn side-btn" id="btnMap">Map</button>
+        <button type="button" class="btn side-btn primary" id="btnConnect">Connect</button>
+        <button type="button" class="btn side-btn" id="btnSettings">Settings</button>
+        <button type="button" class="btn side-btn" id="btnQuit">Quit</button>
+      </aside>
+    </div>
+
+    <script src="../shared/frequency.js"></script>
+    <script src="../shared/sdrconnect.js"></script>
+    <script src="panel.js"></script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-Copyright (c) 2026 DEIN NAME
+Copyright (c) 2026 JÜRGEN WAISSNIX / OE3JGW
 
 This work is licensed under the Creative Commons
 Attribution-NonCommercial 4.0 International License.

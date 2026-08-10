@@ -17,34 +17,55 @@ const { parseFile, detectType, clearCache } = require('./parsers');
 const PRELOAD = path.join(__dirname, 'preload.js');
 const RENDERER = path.join(__dirname, '..', 'renderer');
 
-const DOWNLOAD_SOURCES = [
-  {
-    id: 'eibi-txt',
-    name: 'EiBi (eibi.txt)',
-    url: 'http://www.eibispace.de/dx/eibi.txt',
-    filename: 'eibi.txt',
-    type: 'eibi-txt'
-  },
-  {
-    id: 'rww',
-    name: 'RWW / Classaxe (CSV)',
-    url: 'https://rxx.classaxe.com/en/rww/signals?types=ALL&show=csv',
-    filename: 'rww.csv',
-    type: 'rww-csv'
-  },
-  {
-    id: 'numbers',
-    name: 'Numbers & Oddities',
-    url: 'http://www.numbersoddities.nl/Numbers-database-2025.csv',
-    filename: 'numbers-oddities.csv',
-    type: 'numbers'
-  }
-];
+function numbersOdditiesUrls() {
+  const year = new Date().getFullYear();
+  return [
+    `http://www.numbersoddities.nl/Numbers-database-${year}.csv`,
+    `http://www.numbersoddities.nl/Numbers-database-${year - 1}.csv`
+  ];
+}
+
+function getDownloadSources() {
+  return [
+    {
+      id: 'eibi-txt',
+      name: 'EiBi (eibi.txt)',
+      urls: ['http://www.eibispace.de/dx/eibi.txt'],
+      filename: 'eibi.txt',
+      type: 'eibi-txt'
+    },
+    {
+      id: 'rww',
+      name: 'RWW / Classaxe (CSV)',
+      urls: ['https://rxx.classaxe.com/en/rww/signals?types=ALL&show=csv'],
+      filename: 'rww.csv',
+      type: 'rww-csv'
+    },
+    {
+      id: 'numbers',
+      name: 'Numbers & Oddities',
+      urls: numbersOdditiesUrls(),
+      filename: 'numbers-oddities.csv',
+      type: 'numbers'
+    }
+  ];
+}
+
+function downloadSourcesForUi() {
+  return getDownloadSources().map((s) => ({
+    id: s.id,
+    name: s.name,
+    url: s.urls[0],
+    filename: s.filename,
+    type: s.type
+  }));
+}
 
 let mainWindow = null;
 let settingsWindow = null;
 let mapWindow = null;
 let mapView = null;
+let autoUpdateRunning = false;
 
 /** Active list kept in memory. */
 let activeData = {
@@ -348,6 +369,112 @@ function downloadToFile(url, destPath) {
   });
 }
 
+async function downloadToFileWithFallback(urls, destPath) {
+  let lastErr = null;
+  for (const url of urls) {
+    try {
+      await downloadToFile(url, destPath);
+      return { path: destPath, url };
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error('Download failed');
+}
+
+/** Download a built-in source; activate=true switches the active list (manual download). */
+async function applyDownload(sourceId, { activate = true } = {}) {
+  const source = getDownloadSources().find((s) => s.id === sourceId);
+  if (!source) throw new Error('Unknown download source');
+
+  ensureDataDir();
+  const dest = path.join(paths.userDataDir, source.filename);
+  const fetched = await downloadToFileWithFallback(source.urls, dest);
+
+  if (!source.type) {
+    return { registered: false, path: dest, url: fetched.url, name: source.name };
+  }
+
+  clearCache();
+  const cfg = config.load();
+  const existing = cfg.lists.find((l) => l.path === dest || l.id === `dl-${source.id}`);
+  let next;
+  let list;
+  if (existing) {
+    list = { ...existing, path: dest, type: source.type, name: source.name };
+    const lists = cfg.lists.map((l) => (l.id === existing.id ? list : l));
+    const patch = { lists };
+    if (activate) patch.activeListId = list.id;
+    next = config.update(patch);
+  } else {
+    list = {
+      id: `dl-${source.id}`,
+      name: source.name,
+      type: source.type,
+      path: dest
+    };
+    const patch = { lists: [...cfg.lists, list] };
+    if (activate) patch.activeListId = list.id;
+    next = config.update(patch);
+  }
+
+  const activePath = next.lists.find((l) => l.id === next.activeListId)?.path;
+  if (activate || activePath === dest) {
+    loadActiveListIntoMemory(next);
+  }
+  broadcast('config:changed', next);
+  return { registered: true, path: dest, url: fetched.url, list, config: next, meta: activeMeta() };
+}
+
+async function runAutoUpdates() {
+  if (autoUpdateRunning) return;
+  const cfg = config.load();
+  if (!cfg.downloads?.autoUpdate) return;
+
+  const intervalMs = Math.max(1, Number(cfg.downloads.intervalHours) || 24) * 60 * 60 * 1000;
+  const last = Number(cfg.downloads.lastCheckAt) || 0;
+  if (Date.now() - last < intervalMs && last > 0) return;
+
+  const registered = new Set();
+  for (const list of cfg.lists || []) {
+    if (list.id && String(list.id).startsWith('dl-')) registered.add(String(list.id).slice(3));
+    const base = path.basename(list.path || '').toLowerCase();
+    for (const source of getDownloadSources()) {
+      if (base === source.filename.toLowerCase()) registered.add(source.id);
+    }
+  }
+
+  const sources = getDownloadSources().filter((s) => registered.has(s.id));
+  if (!sources.length) {
+    config.update({
+      downloads: {
+        ...config.load().downloads,
+        lastCheckAt: Date.now()
+      }
+    });
+    return;
+  }
+
+  autoUpdateRunning = true;
+  try {
+    for (const source of sources) {
+      try {
+        await applyDownload(source.id, { activate: false });
+      } catch {
+        /* keep going; next interval retries */
+      }
+    }
+    config.update({
+      downloads: {
+        ...config.load().downloads,
+        lastCheckAt: Date.now()
+      }
+    });
+  } finally {
+    autoUpdateRunning = false;
+  }
+}
+
 function sortRows(rows, sortKey, sortDir) {
   if (!sortKey) return rows;
   const dir = sortDir >= 0 ? 1 : -1;
@@ -586,42 +713,9 @@ ipcMain.handle('lists:schema', (_event, listId) => {
   }
 });
 
-ipcMain.handle('lists:download-sources', () => DOWNLOAD_SOURCES);
+ipcMain.handle('lists:download-sources', () => downloadSourcesForUi());
 
-ipcMain.handle('lists:download', async (_event, sourceId) => {
-  const source = DOWNLOAD_SOURCES.find((s) => s.id === sourceId);
-  if (!source) throw new Error('Unknown download source');
-  if (!source.type) {
-    ensureDataDir();
-    const dest = path.join(paths.userDataDir, source.filename);
-    await downloadToFile(source.url, dest);
-    return { registered: false, path: dest, name: source.name };
-  }
-  ensureDataDir();
-  const dest = path.join(paths.userDataDir, source.filename);
-  await downloadToFile(source.url, dest);
-  clearCache();
-  const cfg = config.load();
-  const existing = cfg.lists.find((l) => l.path === dest || l.id === `dl-${source.id}`);
-  let next;
-  let list;
-  if (existing) {
-    list = { ...existing, path: dest, type: source.type, name: source.name };
-    const lists = cfg.lists.map((l) => (l.id === existing.id ? list : l));
-    next = config.update({ lists, activeListId: list.id });
-  } else {
-    list = {
-      id: `dl-${source.id}`,
-      name: source.name,
-      type: source.type,
-      path: dest
-    };
-    next = config.update({ lists: [...cfg.lists, list], activeListId: list.id });
-  }
-  loadActiveListIntoMemory(next);
-  broadcast('config:changed', next);
-  return { registered: true, path: dest, list, config: next, meta: activeMeta() };
-});
+ipcMain.handle('lists:download', async (_event, sourceId) => applyDownload(sourceId, { activate: true }));
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -638,6 +732,9 @@ if (!app.requestSingleInstanceLock()) {
     const cfg = repairListPaths(config.load());
     loadActiveListIntoMemory(cfg);
     createMainWindow();
+    setTimeout(() => {
+      runAutoUpdates().catch(() => {});
+    }, 2500);
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
     });

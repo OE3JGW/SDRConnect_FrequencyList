@@ -1,7 +1,7 @@
 {
   "name": "sdrconnect-frequencylist",
   "productName": "SDRconnect FrequencyList",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Horizontal frequency list panel for SDRconnect with multi-format list support",
   "author": "SDRconnect FrequencyList",
   "main": "src/main/main.js",

@@ -5,7 +5,7 @@ const path = require('path');
 
 const paths = require('./paths');
 
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 const DEFAULT_WIDTH = 1400;
 const DEFAULT_HEIGHT = 220;
 const DEFAULT_FONT_SIZE = 15;
@@ -51,6 +51,11 @@ function baseConfig() {
     columnWidthsByListId: {},
     columnWidthsByListType: {},
     sortByListType: {},
+    downloads: {
+      autoUpdate: true,
+      intervalHours: 24,
+      lastCheckAt: 0
+    },
     windows: {
       frequencyList: { width: defaultWidth(), height: DEFAULT_HEIGHT },
       settings: { width: 980, height: 720 },
@@ -124,6 +129,13 @@ function normalize(cfg) {
   if (!isPlainObject(merged.columnWidthsByListId)) merged.columnWidthsByListId = {};
   if (!isPlainObject(merged.columnWidthsByListType)) merged.columnWidthsByListType = {};
   if (!isPlainObject(merged.sortByListType)) merged.sortByListType = {};
+
+  const dl = isPlainObject(merged.downloads) ? merged.downloads : {};
+  merged.downloads = {
+    autoUpdate: dl.autoUpdate !== false,
+    intervalHours: Math.max(1, Math.min(168, Number(dl.intervalHours) || 24)),
+    lastCheckAt: Number.isFinite(Number(dl.lastCheckAt)) ? Number(dl.lastCheckAt) : 0
+  };
 
   const win = merged.windows || {};
   const fl = win.frequencyList || {};

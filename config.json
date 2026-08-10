@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "connection": {
     "host": "127.0.0.1",
     "port": 5454,
@@ -17,6 +17,11 @@
   "columnWidthsByListId": {},
   "columnWidthsByListType": {},
   "sortByListType": {},
+  "downloads": {
+    "autoUpdate": true,
+    "intervalHours": 24,
+    "lastCheckAt": 0
+  },
   "windows": {
     "frequencyList": {
       "width": 1400,

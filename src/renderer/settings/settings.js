@@ -8,6 +8,7 @@ const el = {
   btnReloadList: document.getElementById('btnReloadList'),
   listRegistry: document.getElementById('listRegistry'),
   downloadList: document.getElementById('downloadList'),
+  autoUpdateLists: document.getElementById('autoUpdateLists'),
   columnList: document.getElementById('columnList'),
   columnSourceSelect: document.getElementById('columnSourceSelect'),
   sidebarSide: document.getElementById('sidebarSide'),
@@ -194,6 +195,7 @@ async function renderDownloads() {
 function fillForm() {
   el.sidebarSide.value = config.ui.sidebarSide;
   el.alwaysOnTop.checked = Boolean(config.ui.alwaysOnTop);
+  el.autoUpdateLists.checked = config.downloads?.autoUpdate !== false;
   el.connHost.value = config.connection.host;
   el.connPort.value = config.connection.port;
   el.connDevice.value = config.connection.device;
@@ -288,6 +290,15 @@ async function init() {
 
   el.alwaysOnTop.addEventListener('change', async () => {
     config = await window.api.config.set({ ui: { ...config.ui, alwaysOnTop: el.alwaysOnTop.checked } });
+  });
+
+  el.autoUpdateLists.addEventListener('change', async () => {
+    config = await window.api.config.set({
+      downloads: {
+        ...(config.downloads || {}),
+        autoUpdate: el.autoUpdateLists.checked
+      }
+    });
   });
 
   const saveConn = async () => {

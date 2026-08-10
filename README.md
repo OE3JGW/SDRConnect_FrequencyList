@@ -15,7 +15,7 @@ Frameless window, portable `config.json`, remembered window position and bounds,
 - Download known sources (EiBi, RWW, N&O) into `data/`
 - Connect to SDRconnect and tune by clicking a row
 - Satellite map window for station coordinates (when the list provides lat/lon)
-- - autoupdate for EiBi, RWW/Classaxe and Numbers & Oddities
+- autoupdate for EiBi, RWW/Classaxe and Numbers & Oddities
 
 ## Data
 

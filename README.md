@@ -19,12 +19,13 @@ Frameless window, portable `config.json`, remembered window position and bounds,
 
 ## Data
 
-Im not responable for your data sources. Aquire them and use them by your own responsability.
+**Im not responable for your data sources. Aquire them and use them by your own responsability.**
+
 List sources are third-party; check their terms before redistributing/usage.
-ILGADATA --> https://www.ilgradio.com/
-EiBi --> http://www.eibispace.de/dx/eibi.txt
-RWW/Classaxe --> https://rxx.classaxe.com/en/rww/signals?types=ALL&show=csv
-Numbers & Oddities --> http://www.numbersoddities.nl/Numbers-database-2025.csv
+- ILGADATA --> https://www.ilgradio.com/
+- EiBi --> http://www.eibispace.de/dx/eibi.txt
+- RWW/Classaxe --> https://rxx.classaxe.com/en/rww/signals?types=ALL&show=csv
+- Numbers & Oddities --> http://www.numbersoddities.nl/Numbers-database-2025.csv
 
 
 ## Run

@@ -28,7 +28,15 @@ List sources are third-party; check their terms before redistributing/usage.
 - Numbers & Oddities --> http://www.numbersoddities.nl/Numbers-database-2025.csv
 
 
-## Run
-
+## Run 
+**Windows:**
 Portable EXE in `release/<version>/`.
+
+**Linux:**
+Prerequisits: npm and node installed
+Compiling and running:
+git clone https://github.com/OE3JGW/SDRConnect_FrequencyList.git
+cd SDRConnect_FrequencyList
+npm install
+npm start
 
